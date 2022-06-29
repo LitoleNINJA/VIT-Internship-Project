@@ -1,20 +1,10 @@
 import RichTextEditor from 'react-rte';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../styles/TextBox.css';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import ListItemText from '@mui/material/ListItemText';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import Checkbox from '@mui/material/Checkbox';
-import Chip from '@mui/material/Chip';
-import Typography from '@mui/material/Typography';
+import { TextField, Box, Radio, RadioGroup, Select, MenuItem, FormControlLabel, ListItemText, OutlinedInput, Checkbox, Chip, Button } from '@mui/material';
 
-export default function TextBox() {
+
+export default function TextBox({ questions, setQuestions, handleAddPage, currentQuestion }) {
 
     const [tolerance, setTolerance] = useState(0);
     const [minutes, setMinutes] = useState(0);
@@ -23,6 +13,26 @@ export default function TextBox() {
     const [marks, setMarks] = useState(0);
     const [editorState, setEditorState] = useState(RichTextEditor.createEmptyValue());
     const [domains, setDomains] = useState([]);
+
+    useEffect(() => {
+        if (currentQuestion) {
+            setTolerance(currentQuestion.tolerance);
+            setMinutes(currentQuestion.minutes);
+            setSeconds(currentQuestion.seconds);
+            setLevel(currentQuestion.level);
+            setMarks(currentQuestion.marks);
+            setDomains(currentQuestion.domains);
+            setEditorState(currentQuestion.description);
+        } else {
+            setTolerance(0);
+            setMinutes(0);
+            setSeconds(0);
+            setLevel('easy');
+            setMarks(0);
+            setDomains([]);
+            setEditorState(RichTextEditor.createEmptyValue());
+        }
+    }, [currentQuestion]);
 
     const toolbarConfig = {
         display: ['INLINE_STYLE_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'BLOCK_TYPE_DROPDOWN', 'HISTORY_BUTTONS'],
@@ -56,18 +66,35 @@ export default function TextBox() {
         'Domain 3',
         'Domain 4',
         'Domain 5',
-        'Domain 6',
-        'Domain 7',
-        'Domain 8',
-        'Domain 9',
-        'Domain 10'
     ];
+
+    const handleAddQuestion = () => {
+        const question = {
+            description: editorState,
+            tolerance: tolerance,
+            minutes: minutes,
+            seconds: seconds,
+            level: level,
+            marks: marks,
+            domains: domains
+        };
+        setQuestions([...questions, question]);
+        setTolerance(0);
+        setMinutes(0);
+        setSeconds(0);
+        setLevel('easy');
+        setMarks(0);
+        setDomains([]);
+        setEditorState(RichTextEditor.createEmptyValue());
+        handleAddPage();
+    }
 
     return (
         <Box sx={{
             padding: '2rem 10rem',
+            display: 'flex',
+            flexDirection: 'column',
         }}>
-            <h1 className='questionHeading'>Create Fill In The Blanks Question</h1>
             <h2>Question Discription</h2>
             <RichTextEditor data-testid="question-input" value={editorState} onChange={setEditorState} toolbarConfig={toolbarConfig} />
 
@@ -79,11 +106,11 @@ export default function TextBox() {
                 mt: '2rem'
             }}>
                 <h2>Tolerance Level (in %) : </h2>
-                <TextField label="Tolerance %" variant="outlined" size='small'
-                onChange={(e) => setTolerance(e.target.value)}
-                sx={{
-                    marginLeft: '2rem'
-                }} />
+                <TextField label="Tolerance %" variant="outlined" size='small' value={tolerance}
+                    onChange={(e) => setTolerance(e.target.value)}
+                    sx={{
+                        marginLeft: '2rem'
+                    }} />
             </Box>
 
             <Box sx={{
@@ -94,18 +121,18 @@ export default function TextBox() {
                 mt: '2rem'
             }}>
                 <h2>Set Timer : </h2>
-                <TextField label="Minutes" variant="outlined" defaultValue='00' size='small' 
-                onChange={(e) => setMinutes(e.target.value)}
-                sx={{
-                    marginLeft: '2rem',
-                    marginRight: '1rem'
-                }} />
+                <TextField label="Minutes" variant="outlined" size='small' value={minutes}
+                    onChange={(e) => setMinutes(e.target.value)}
+                    sx={{
+                        marginLeft: '2rem',
+                        marginRight: '1rem'
+                    }} />
                 <h2> : </h2>
-                <TextField label="Seconds" variant="outlined" defaultValue='00' size='small' 
-                onChange={(e) => setSeconds(e.target.value)}
-                sx={{
-                    marginLeft: '1rem'
-                }} />
+                <TextField label="Seconds" variant="outlined" size='small' value={seconds}
+                    onChange={(e) => setSeconds(e.target.value)}
+                    sx={{
+                        marginLeft: '1rem'
+                    }} />
             </Box>
 
             <Box sx={{
@@ -116,7 +143,7 @@ export default function TextBox() {
             }}>
                 <h2>Level of Question : </h2>
                 <RadioGroup
-                    defaultValue="easy"
+                    value={level}
                     name="radio-buttons-group"
                     sx={{
                         display: 'flex',
@@ -167,17 +194,17 @@ export default function TextBox() {
                 <h2 style={{
                     marginLeft: '4rem'
                 }}>Add Domain : </h2>
-                <TextField label="Custom Domain" variant="outlined" size='small' 
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                        setDomains([...domains, e.target.value]);
-                        e.target.value = '';
-                    }
-                }}
-                sx={{
-                    marginLeft: '2rem',
-                    marginRight: '1rem'
-                }} />
+                <TextField label="Custom Domain" variant="outlined" size='small'
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            setDomains([...domains, e.target.value]);
+                            e.target.value = '';
+                        }
+                    }}
+                    sx={{
+                        marginLeft: '2rem',
+                        marginRight: '1rem'
+                    }} />
             </Box>
 
             <Box sx={{
@@ -188,12 +215,17 @@ export default function TextBox() {
                 mt: '2rem'
             }}>
                 <h2>Marks for Question : </h2>
-                <TextField label="Marks out of 100" variant="outlined" size='small' type='number' 
-                onChange={(e) => setMarks(e.target.value)}
-                sx={{
-                    marginLeft: '2rem'
-                }} />
+                <TextField label="Marks out of 100" variant="outlined" size='small' type='number' value={marks}
+                    onChange={(e) => setMarks(e.target.value)}
+                    sx={{
+                        marginLeft: '2rem'
+                    }} />
             </Box>
+
+            <Button variant='contained' color='primary' onClick={handleAddQuestion} sx={{
+                m: '4rem auto',
+                p: '0 2rem'
+            }}><h3>Add Question +</h3></Button>
 
         </Box >
     )
