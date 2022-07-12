@@ -3,3 +3,8 @@
     text-align: center;
     font-size: 3rem;
 }
+
+.DraftEditor-root {
+    border: 1px solid black;
+    padding: 1rem;
+}

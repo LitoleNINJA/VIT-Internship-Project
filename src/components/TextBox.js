@@ -1,18 +1,19 @@
-import RichTextEditor from 'react-rte';
 import { useState, useEffect } from 'react';
 import '../styles/TextBox.css';
 import { TextField, Box, Radio, RadioGroup, Select, MenuItem, FormControlLabel, ListItemText, OutlinedInput, Checkbox, Chip, Button } from '@mui/material';
+import RichtextEditor from './RichtextEditor';
 
 
-export default function TextBox({ questions, setQuestions, handleAddPage, currentQuestion }) {
+export default function TextBox({ questions, setQuestions, handleAddPage, handleRemovePage, currentQuestion }) {
 
     const [tolerance, setTolerance] = useState(0);
     const [minutes, setMinutes] = useState(0);
     const [seconds, setSeconds] = useState(0);
     const [level, setLevel] = useState('easy');
     const [marks, setMarks] = useState(0);
-    const [editorState, setEditorState] = useState(RichTextEditor.createEmptyValue());
+    const [editorState, setEditorState] = useState('');
     const [domains, setDomains] = useState([]);
+    const [allDomains, setAllDomains] = useState(['Domain 1', 'Domain 2', 'Domain 3', 'Domain 4', 'Domain 5']);
 
     useEffect(() => {
         if (currentQuestion) {
@@ -30,28 +31,9 @@ export default function TextBox({ questions, setQuestions, handleAddPage, curren
             setLevel('easy');
             setMarks(0);
             setDomains([]);
-            setEditorState(RichTextEditor.createEmptyValue());
+            setEditorState('');
         }
     }, [currentQuestion]);
-
-    const toolbarConfig = {
-        display: ['INLINE_STYLE_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'BLOCK_TYPE_DROPDOWN', 'HISTORY_BUTTONS'],
-        INLINE_STYLE_BUTTONS: [
-            { label: 'Bold', style: 'BOLD', className: 'custom-css-class' },
-            { label: 'Italic', style: 'ITALIC' },
-            { label: 'Underline', style: 'UNDERLINE' }
-        ],
-        BLOCK_TYPE_DROPDOWN: [
-            { label: 'Normal', style: 'unstyled' },
-            { label: 'Heading Large', style: 'header-one' },
-            { label: 'Heading Medium', style: 'header-two' },
-            { label: 'Heading Small', style: 'header-three' }
-        ],
-        BLOCK_TYPE_BUTTONS: [
-            { label: 'UL', style: 'unordered-list-item' },
-            { label: 'OL', style: 'ordered-list-item' }
-        ]
-    };
 
     const handleDomainSelect = (event) => {
         const {
@@ -59,14 +41,6 @@ export default function TextBox({ questions, setQuestions, handleAddPage, curren
         } = event;
         setDomains(typeof value === 'string' ? value.split(',') : value);
     }
-
-    const Domains = [
-        'Domain 1',
-        'Domain 2',
-        'Domain 3',
-        'Domain 4',
-        'Domain 5',
-    ];
 
     const handleAddQuestion = () => {
         const question = {
@@ -85,8 +59,13 @@ export default function TextBox({ questions, setQuestions, handleAddPage, curren
         setLevel('easy');
         setMarks(0);
         setDomains([]);
-        setEditorState(RichTextEditor.createEmptyValue());
+        setEditorState('');
         handleAddPage();
+    }
+
+    const handleRemoveQuestion = () => {
+        currentQuestion = questions[questions.length - 1];
+        handleRemovePage();
     }
 
     return (
@@ -96,7 +75,7 @@ export default function TextBox({ questions, setQuestions, handleAddPage, curren
             flexDirection: 'column',
         }}>
             <h2>Question Discription</h2>
-            <RichTextEditor data-testid="question-input" value={editorState} onChange={setEditorState} toolbarConfig={toolbarConfig} />
+            <RichtextEditor editorState={editorState} setEditorState={setEditorState} />
 
             <Box sx={{
                 width: '100%',
@@ -183,7 +162,7 @@ export default function TextBox({ questions, setQuestions, handleAddPage, curren
                         ml: '2rem',
                     }}
                 >
-                    {Domains.map((domain) => (
+                    {allDomains.map((domain) => (
                         <MenuItem key={domain} value={domain}>
                             <Checkbox checked={domains.indexOf(domain) > -1} />
                             <ListItemText primary={domain} />
@@ -197,6 +176,7 @@ export default function TextBox({ questions, setQuestions, handleAddPage, curren
                 <TextField label="Custom Domain" variant="outlined" size='small'
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
+                            setAllDomains([...allDomains, e.target.value]);
                             setDomains([...domains, e.target.value]);
                             e.target.value = '';
                         }
@@ -222,10 +202,24 @@ export default function TextBox({ questions, setQuestions, handleAddPage, curren
                     }} />
             </Box>
 
-            <Button variant='contained' color='primary' onClick={handleAddQuestion} sx={{
-                m: '4rem auto',
-                p: '0 2rem'
-            }}><h3>Add Question +</h3></Button>
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+            }}>
+                <Button variant='contained' color='primary' onClick={handleAddQuestion} sx={{
+                    mt: '4rem',
+                    mb: '2rem',
+                    p: '0 2rem'
+                }}><h3>Add Question +</h3></Button>
+
+                <Button variant='contained' color='primary' onClick={handleRemoveQuestion} sx={{
+                    mt: '4rem',
+                    mb: '2rem',
+                    p: '0 2rem'
+                }}><h3>Remove Question -</h3></Button>
+            </Box>
+
 
         </Box >
     )
