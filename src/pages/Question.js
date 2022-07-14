@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Box, Button, Pagination } from '@mui/material';
-import TextBox from '../components/TextBox';
+import FITBQuestion from '../components/FITBQuestion';
 
 export default function Question() {
   const [pageCount, setPageCount] = useState(1);
@@ -31,7 +31,7 @@ export default function Question() {
 
       <h1 className='questionHeading'>Question {page}</h1>
 
-      <TextBox questions={questions} setQuestions={setQuestions} handleAddPage={handleAddPage} currentQuestion={questions[page - 1]} handleRemovePage={handleRemovePage} />
+      <FITBQuestion questions={questions} setQuestions={setQuestions} handleAddPage={handleAddPage} currentQuestion={questions[page - 1]} handleRemovePage={handleRemovePage} />
 
 
       <Pagination onChange={(e, v) => setPage(v)} count={pageCount} page={page} color='primary' sx={{

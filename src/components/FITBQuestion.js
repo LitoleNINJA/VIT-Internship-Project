@@ -4,7 +4,7 @@ import { TextField, Box, Radio, RadioGroup, Select, MenuItem, FormControlLabel, 
 import RichtextEditor from './RichtextEditor';
 
 
-export default function TextBox({ questions, setQuestions, handleAddPage, handleRemovePage, currentQuestion }) {
+export default function FITBQuestion({ questions, setQuestions, handleAddPage, handleRemovePage, currentQuestion }) {
 
     const [tolerance, setTolerance] = useState(0);
     const [minutes, setMinutes] = useState(0);
@@ -219,8 +219,6 @@ export default function TextBox({ questions, setQuestions, handleAddPage, handle
                     p: '0 2rem'
                 }}><h3>Remove Question -</h3></Button>
             </Box>
-
-
         </Box >
     )
 }
